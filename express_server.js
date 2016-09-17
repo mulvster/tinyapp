@@ -22,28 +22,6 @@ var urlDatabase = {
 
 console.log(`Connecting to MongoDB running at: ${MONGODB_URI}`);
 
-// var dbInstance;
-
-// MongoClient.connect(MONGODB_URI, (err, db) => {
-//     if (err) {
-//     console.log('Could not connect! Unexpected error. Details below.');
-//     throw err;
-//   }
-//   dbInstance = db;
-
-
-//   console.log('Connected to the database!');
-//   let collection = db.collection("urls");
-
-//   console.log('Retreiving documents for the "test" collection...');
-//   collection.find().toArray((err, results) => {
-//     console.log('results: ', results);
-
-
-
-//   });
-// });
-
 
 function findURLs(){
 
@@ -51,7 +29,7 @@ function findURLs(){
     // use db to find urls
     db.collection("urls").find({}, function(results){
       console.log("This many results: "+results.length);
-    });
+    })
   });
 }
 
@@ -82,16 +60,20 @@ function getLongURL(db, shortURL, cb) {
 function connectAndThen(cb){
 
   MongoClient.connect(MONGODB_URI, (err, db) => {
+
+    if (err) {
+      console.log('Could not connect! Unexpected error. Details below.');
+      throw err;
+    }
+
     cb(err, db);
-  });
+  })
 }
 
 
+
 app.get("/urls", (req, res) => {
-
-
-  connectAndThen(function(err, db){
-
+ connectAndThen(function(err, db){
     console.log("Connected to db then did this!");
     console.log("With errors: "+err);
 
@@ -106,23 +88,14 @@ app.get("/urls", (req, res) => {
 
 });
 
+//this is the page that displays the form
+app.get("/urls/new", (req, res) => {
+  console.log("GET /urls_new");
+  res.render("urls_new");
 
-// app.get("/urls/new", (req, res) => {
-//   console.log("GET /urls_new");
-//   res.render("urls_new");
+});
 
-// });
-
-//EXAMPLE one//////////////////////////////
-// app.get("/urls/:key/edit", (req, res) => {
-//   var templateVars1 = {
-//     longURL: urlDatabase[req.params.key],
-//     key: req.params.key
-//   };
-//   res.render("urls_show", templateVars1);
-// });
-///////////////////////////////////////////
-
+                                                                //must use to.Array everytime we're using to.find()
 app.get("/urls/:id/edit", (req, res) => {
   let shortURL = req.params.id;
   getLongURL(dbInstance, shortURL, (err, longURL) => {
@@ -140,16 +113,23 @@ app.put("/urls/:key/edit", (req, res) =>{
 });
 
 app.post("/urls", (req, res) => {
-  console.log("POST /urls", req.body)
-  var theShortURL = generateRandomString();
-  var userEnterURL = req.body.longURL;
-  urlDatabase[theShortURL] = userEnterURL;
-  console.log(urlDatabase);
- res.redirect('urls/shortURL');
+connectAndThen(function(err, db){
+
+    var newURL = {
+    shortURL: generateRandomString(),
+    longURL: req.body.longURL
+  }
+//new document will look different from our newURL variable because it will have the mongo generated id.
+  db.collection("urls").insert(newURL, (err, url) => {
+    if(err) res.status(500).json(err);
+    res.redirect('u/shortURL' + newURL.shortURL);
+  })
+
+})
 
 });
-
-
+  //the params is coming from the url that is how we're transferring our keys
+  //the body refers to the post body
 
 
 app.delete("/urls/:key", (req, res) => {
@@ -157,15 +137,15 @@ app.delete("/urls/:key", (req, res) => {
    connectAndThen(function(err, db){
 
     console.log("Connected to db then tried to delete!");
-    console.log("With errors: "+err);
+    // console.log("With errors: "+ err);
 
 
     db.collection("urls").deleteOne({shortURL: req.params.key}, function (err) {
       console.log(err);
-    })
-      console.log("HI");
+    }) //if err? do we want to show and error message?
+    console.log("HI");
 
-      res.redirect("/urls");
+    res.redirect("/urls");
   });
 
 
@@ -173,32 +153,60 @@ app.delete("/urls/:key", (req, res) => {
 
 
 
-// app.delete("/urls/:key", (req, res) => {
-//    var deleteKey = req.params.key;
-//    delete urlDatabase[deleteKey];
-//    res.redirect("/urls");
-// });
 
-
-
-
-// app.put("urls/:key", (req, res) => {
-//     var editKey = req.params.key
-// });
-
-app.get("/urls/shortURL", (req, res) => {
-  console.log(Object.keys(urlDatabase));
-  var length = Object.keys(urlDatabase).length - 1;
-  var theShortenedURL = Object.keys(urlDatabase)[length];
-  res.render('urls_create', {shortURL: theShortenedURL});
-});
-
+//this is the redirect page
+/* this route finds a shortURL and then redirects to the longURL
+*/
 app.get("/u/:shortURL", (req, res) => {
-  var longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+  //connect to the database
+  connectAndThen((err,db) => {
+    //we have a connection
+
+    //Find url with the matching shortURL
+    db.collection('urls').findOne({shortURL: req.params.shortURL}, (err, url) => {
+      console.log('found url', url);
+      // redirect to the longURL
+      res.redirect('urls_create');
+    })
+  })
+
 });
+
+/// [{}] . find so must use .toArray
+//   {}  .findOne returns an object so we dont need to use to array.
 
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
+
+
+
+// create -> show the creation form
+// show -> show the details of a shortURL
+// index -> list all the URLS
+// edit -> show a form to edit a shortURL
+
+
+
+//show information about a url("show page" but not the actual show page its our edit page.)
+//you will get this page after you create your short url.
+// We'll redirect here after
+
+
+app.get('/urls/:key', (req,res) => {
+   var shortURL = req.params.key;
+   connectAndThen((err,db) => {
+    //we have a connection
+
+    //Find url with the matching shortURL
+    db.collection('urls').findOne({shortURL: shortURL}, (err, url) => {
+      console.log('found url', url);
+      // display information about the url
+      res.render('urls_show', {url: url});
+    })
+  })
+
+});
+
+
