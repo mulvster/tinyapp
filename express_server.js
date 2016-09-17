@@ -122,7 +122,7 @@ connectAndThen(function(err, db){
 //new document will look different from our newURL variable because it will have the mongo generated id.
   db.collection("urls").insert(newURL, (err, url) => {
     if(err) res.status(500).json(err);
-    res.redirect('u/shortURL' + newURL.shortURL);
+    res.redirect('u/' + newURL.shortURL);
   })
 
 })
@@ -157,7 +157,7 @@ app.delete("/urls/:key", (req, res) => {
 //this is the redirect page
 /* this route finds a shortURL and then redirects to the longURL
 */
-app.get("/u/:shortURL", (req, res) => {
+app.get("/urls/u/:shortURL", (req, res) => {
   //connect to the database
   connectAndThen((err,db) => {
     //we have a connection
@@ -166,7 +166,7 @@ app.get("/u/:shortURL", (req, res) => {
     db.collection('urls').findOne({shortURL: req.params.shortURL}, (err, url) => {
       console.log('found url', url);
       // redirect to the longURL
-      res.redirect('urls_create');
+      res.redirect('/urls');
     })
   })
 
