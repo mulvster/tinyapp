@@ -98,10 +98,16 @@ app.get("/urls/new", (req, res) => {
                                                                 //must use to.Array everytime we're using to.find()
 app.get("/urls/:id/edit", (req, res) => {
   let shortURL = req.params.id;
-  getLongURL(dbInstance, shortURL, (err, longURL) => {
-    console.log(longURL);
-    // the longURL available in a callback function
-
+  connectAndThen(function(err, db){
+    getLongURL(db, shortURL, (err, longURL) => {
+      console.log(longURL);
+      // the longURL available in a callback function
+      templateVars = {
+        'shortURL': shortURL,
+        'longURL': longURL
+      }
+      res.render("urls_show", templateVars);
+    });
   });
 });
 
@@ -155,7 +161,7 @@ app.delete("/urls/:key", (req, res) => {
 //this is the redirect page
 /* this route finds a shortURL and then redirects to the longURL
 */
-app.get("/urls/u/:shortURL", (req, res) => {
+app.get("/u/:shortURL", (req, res) => {
   //connect to the database
   connectAndThen((err,db) => {
     //we have a connection
@@ -164,7 +170,13 @@ app.get("/urls/u/:shortURL", (req, res) => {
     db.collection('urls').findOne({shortURL: req.params.shortURL}, (err, url) => {
       console.log('found url', url);
       // redirect to the longURL
-      res.redirect('/urls');
+      getLongURL(db, req.params.shortURL, (err, longURL) => {
+        let templateVars = {
+          'shortURL': req.params.shortURL,
+          'longURL': longURL
+        }
+        res.render('urls_create', templateVars);
+      })
     })
   })
 
