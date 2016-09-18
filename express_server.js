@@ -97,18 +97,30 @@ app.get("/urls/new", (req, res) => {
 
                                                                 //must use to.Array everytime we're using to.find()
 app.get("/urls/:id/edit", (req, res) => {
-  let shortURL = req.params.id;
-  connectAndThen(function(err, db){
-    getLongURL(db, shortURL, (err, longURL) => {
-      console.log(longURL);
-      // the longURL available in a callback function
-      templateVars = {
-        'shortURL': shortURL,
-        'longURL': longURL
-      }
-      res.render("urls_show", templateVars);
-    });
+  // let shortURL = req.params.id;
+//   connectAndThen(function(err, db){
+//     getLongURL(db, shortURL, (err, longURL) => {
+//       console.log(longURL);
+//       // // the longURL available in a callback function
+//       // templateVars = {
+//       //   'shortURL': shortURL,
+//       //   'longURL': longURL
+//       // }
+//       res.render("urls_show", {longURL: longURL});
+//     });
+//   });
+// });
+
+ connectAndThen(function(err, db) {
+    if (err) {
+      console.log("With errors: "+err);
+    }
+    //when you're using "find" you have to use ".toArray" to get the information back.
+    db.collection("urls").findOne({shortURL: req.params.id}, (err, url) => {
+      res.render("urls_show", {url: url});
+    })
   });
+
 });
 
 
@@ -119,16 +131,20 @@ app.put("/urls/:key/edit", (req, res) =>{
 });
 
 app.post("/urls", (req, res) => {
-connectAndThen(function(err, db){
-
-    var newURL = {
+  var newURL = {
     shortURL: generateRandomString(),
     longURL: req.body.longURL
   }
+connectAndThen(function(err, db){
+
+  //   var newURL = {
+  //   shortURL: generateRandomString(),
+  //   longURL: req.body.longURL
+  // }
 //new document will look different from our newURL variable because it will have the mongo generated id.
   db.collection("urls").insert(newURL, (err, url) => {
     if(err) res.status(500).json(err);
-    res.redirect('u/' + newURL.shortURL);
+    res.render("urls_create", {url: newURL.longURL});
   })
 
 })
