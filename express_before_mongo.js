@@ -60,11 +60,19 @@ app.post("/urls", (req, res) => {
 
 });
 
+<<<<<<< HEAD
 app.delete("/urls/:key", (req, res) => {
    var deleteKey = req.params.key;
    delete urlDatabase[deleteKey];
    res.redirect("/urls");
 });
+=======
+// app.delete("/urls/:key", (req, res) => {
+//    var deleteKey = req.params.key;
+//    delete urlDatabase[deleteKey];
+//    res.redirect("/urls");
+// });
+>>>>>>> feature/mongodb
 
 
 app.get("/urls/shortURL", (req, res) => {
