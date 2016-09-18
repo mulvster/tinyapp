@@ -140,9 +140,7 @@ app.delete("/urls/:key", (req, res) => {
     // console.log("With errors: "+ err);
 
 
-    db.collection("urls").deleteOne({shortURL: req.params.key}, function (err) {
-      console.log(err);
-    }) //if err? do we want to show and error message?
+    db.collection("urls").remove({shortURL: req.params.key}); //if err? do we want to show and error message?
     console.log("HI");
 
     res.redirect("/urls");
