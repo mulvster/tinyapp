@@ -39,7 +39,7 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/:id/edit", (req, res) => {
-  let shortURL = req.params.id;
+  var shortURL = req.params.id;
   connectAndThen((err, db) => {
     getLongURL(db, shortURL, (err, longURL) => {
       console.log(longURL);
