@@ -7,15 +7,15 @@
     </p>
 
 
-   <% for (var key in urls) { %>
-  <li><%= urls[key].shortURL %></li>
-
-    <form method="POST" action="http://localhost:8080/urls/<%= urls[key].shortURL %>?_method=DELETE"><button type="submit">DELETE</button></form></li>
-    <form method="GET" action="http://localhost:8080/urls/<%= urls[key].shortURL %>/edit"><button type="submit">EDIT</button></form>
-
-  <% } %>
+   <% urls.forEach(function(url) { %>
 
 
+      <h2><%= url['shortURL'] %></h2>
+      <li><%= url['longURL'] %></li>
+
+      <form method="POST" action="http://localhost:8080/urls/<%= url['shortURL'] %>?_method=DELETE"><button type="submit">DELETE</button></form></li>
+      <form method="GET" action="http://localhost:8080/urls/<%= url['longURL']%> edit"><button type="submit">EDIT</button></form>
+   <% });%>
 
 </body>
 </html>

@@ -10,7 +10,7 @@ const originalURL = require("./get_long_url")();
 //extract database stuff
 const connectAndThen = databaseFunctions.connectAndThen;
 const generateRandomString = moduleRandomString.generateRandomString;
-const getLongURL = originalURL.getLongURL;
+const getLongURL = originalURL.getLongURL
 
 const app = express();
 app.set("port", process.env.PORT || 8080);
