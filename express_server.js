@@ -14,13 +14,13 @@
 //       return cb(null, result.longURL);
 //   });
 // }
-
+//
 // app.get("/urls/:id/edit", (req, res) => {
 //   let shortURL = req.params.id;
 //     getLongURL(dbInstance, shortURL, (err, longURL) => {
 //       console.log(longURL);
 //   });
-
+//
 // app.get("/urls/new", (req, res) => {
 //   console.log("GET /urls_new");
 //     res.render("urls_new");
@@ -34,13 +34,13 @@
 //     })
 //   });
 // });
-
+//
 // app.put("/urls/:id/edit", (req, res) =>{
 //   urlDatabase[req.params.id] = req.body.longURL;
 //     console.log(urlDatabase);
 //       res.redirect("/urls");
 // });
-
+//
 // app.post("/urls", (req, res) => {
 //   var newURL = {
 //     shortURL: generateRandomString(),
@@ -51,10 +51,10 @@
 //     if(err) res.status(500).json(err);
 //     res.render("urls_create", {url: newURL.longURL});
 //     })
-
+//
 //   })
 // });
-
+//
 // app.delete("/urls/:key", (req, res) => {
 //   connectAndThen(function(err, db){
 //     console.log("Connected to db then tried to delete!");
@@ -66,7 +66,7 @@
 //       res.redirect("/urls");
 //   });
 // });
-
+//
 // app.get("/urls/shortURL", (req, res) => {
 //   console.log(Object.keys(urlDatabase));
 //     var length = Object.keys(urlDatabase).length - 1;
@@ -76,7 +76,7 @@
 //           console.log("HI");
 //             res.redirect("/urls");
 //   });
-
+//
 // app.get("/u/:shortURL", (req, res) => {
 //   connectAndThen((err,db) => {
 //     db.collection('urls').findOne({shortURL: req.params.shortURL}, (err, url) => {
@@ -91,7 +91,7 @@
 //     })
 //   })
 // });
-
+//
 // app.get('/urls/:key', (req,res) => {
 //   var shortURL = req.params.key;
 //    connectAndThen((err,db) => {
